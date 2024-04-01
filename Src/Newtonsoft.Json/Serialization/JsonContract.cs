@@ -69,6 +69,8 @@ namespace Newtonsoft.Json.Serialization
     /// <param name="value">The extension data value.</param>
     public delegate void ExtensionDataSetter(object o, string key, object? value);
 
+    public delegate void OnPropertySet(object o, object value, JsonProperty property, JsonReader reader);
+
     /// <summary>
     /// Gets extension data for an object during serialization.
     /// </summary>

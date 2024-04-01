@@ -102,6 +102,8 @@ namespace Newtonsoft.Json.Serialization
             get => _parameterizedCreator;
             set => _parameterizedCreator = value;
         }
+        
+        public OnPropertySet? OnPropertySetter { get; set; }
 
         /// <summary>
         /// Gets or sets the extension data setter.

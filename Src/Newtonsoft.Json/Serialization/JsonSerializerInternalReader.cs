@@ -1058,6 +1058,9 @@ namespace Newtonsoft.Json.Serialization
             if ((!useExistingValue || value != currentValue)
                 && ShouldSetPropertyValue(property, containerContract as JsonObjectContract, value))
             {
+                if (propertyContract is JsonObjectContract propObjectContract && propObjectContract.OnPropertySetter != null)
+                    propObjectContract.OnPropertySetter(target, value, property, reader);
+                
                 property.ValueProvider!.SetValue(target, value);
 
                 if (property.SetIsSpecified != null)
@@ -2066,6 +2069,9 @@ namespace Newtonsoft.Json.Serialization
             // go through unused values and set the newly created object's properties
             foreach (CreatorPropertyContext context in propertyContexts)
             {
+                if (contract.OnPropertySetter != null)
+                    contract.OnPropertySetter(createdObject, context.Value, context.Property, reader);
+                
                 if (context.Used ||
                     context.Property == null ||
                     context.Property.Ignored ||
@@ -2569,7 +2575,12 @@ namespace Newtonsoft.Json.Serialization
 
                                 if (HasFlag(property.DefaultValueHandling.GetValueOrDefault(Serializer._defaultValueHandling), DefaultValueHandling.Populate) && property.Writable)
                                 {
-                                    property.ValueProvider!.SetValue(newObject, EnsureType(reader, property.GetResolvedDefaultValue(), CultureInfo.InvariantCulture, property.PropertyContract!, property.PropertyType));
+                                    var value = property.GetResolvedDefaultValue();
+                                    
+                                    if (contract.OnPropertySetter != null)
+                                        contract.OnPropertySetter(newObject, value, property, reader);
+                                    
+                                    property.ValueProvider!.SetValue(newObject, EnsureType(reader, value, CultureInfo.InvariantCulture, property.PropertyContract!, property.PropertyType));
                                 }
                             }
                             break;
